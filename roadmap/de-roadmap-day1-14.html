@@ -1,0 +1,3087 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Engineer — Day 1 to 14</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0c0f0a;
+        --surface: #131710;
+        --surface2: #1a1f16;
+        --border: #252c20;
+        --green: #7fc443;
+        --green-dim: #4a7a28;
+        --green-glow: rgba(127, 196, 67, 0.12);
+        --amber: #e8a93c;
+        --amber-dim: rgba(232, 169, 60, 0.15);
+        --text: #c8d4be;
+        --text-dim: #6b7a62;
+        --text-bright: #e8f0e0;
+        --red: #e05c5c;
+        --blue: #6ba3d6;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Syne", sans-serif;
+        min-height: 100vh;
+        padding: 0 0 80px;
+      }
+
+      /* ── Header ── */
+      header {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 28px 40px 24px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .header-left h1 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--green);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .header-left p {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        margin-top: 3px;
+        letter-spacing: 0.02em;
+      }
+
+      .progress-bar-wrap {
+        flex: 1;
+        max-width: 320px;
+      }
+
+      .progress-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.65rem;
+        color: var(--text-dim);
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+
+      .progress-bar {
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--green);
+        border-radius: 2px;
+        transition: width 0.4s ease;
+        box-shadow: 0 0 8px var(--green);
+      }
+
+      /* ── Week tabs ── */
+      .week-tabs {
+        display: flex;
+        gap: 0;
+        padding: 0 40px;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface);
+        position: sticky;
+        top: 81px;
+        z-index: 99;
+      }
+
+      .week-tab {
+        padding: 12px 28px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+        background: none;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .week-tab.active {
+        color: var(--green);
+        border-bottom-color: var(--green);
+      }
+
+      .week-tab:hover:not(.active) {
+        color: var(--text);
+      }
+
+      /* ── Week panel ── */
+      .week-panel {
+        display: none;
+        padding: 40px;
+      }
+      .week-panel.active {
+        display: block;
+      }
+
+      .week-header {
+        margin-bottom: 32px;
+      }
+
+      .week-header h2 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-bright);
+        line-height: 1.1;
+      }
+
+      .week-header h2 span {
+        color: var(--green);
+      }
+
+      .week-header p {
+        color: var(--text-dim);
+        font-size: 0.85rem;
+        margin-top: 8px;
+        max-width: 640px;
+        line-height: 1.6;
+      }
+
+      .week-focus {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+      }
+
+      .focus-tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.65rem;
+        padding: 4px 10px;
+        border-radius: 3px;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .tag-sql {
+        background: rgba(107, 163, 214, 0.15);
+        color: var(--blue);
+        border: 1px solid rgba(107, 163, 214, 0.3);
+      }
+      .tag-linux {
+        background: rgba(232, 169, 60, 0.15);
+        color: var(--amber);
+        border: 1px solid rgba(232, 169, 60, 0.3);
+      }
+      .tag-python {
+        background: rgba(127, 196, 67, 0.12);
+        color: var(--green);
+        border: 1px solid rgba(127, 196, 67, 0.25);
+      }
+      .tag-git {
+        background: rgba(224, 92, 92, 0.12);
+        color: var(--red);
+        border: 1px solid rgba(224, 92, 92, 0.25);
+      }
+      .tag-project {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-dim);
+        border: 1px solid var(--border);
+      }
+
+      /* ── Day grid ── */
+      .days-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+        gap: 20px;
+      }
+
+      /* ── Day card ── */
+      .day-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: border-color 0.2s;
+      }
+
+      .day-card:hover {
+        border-color: var(--green-dim);
+      }
+
+      .day-card.all-done {
+        border-color: var(--green-dim);
+        background: linear-gradient(
+          135deg,
+          var(--surface),
+          rgba(127, 196, 67, 0.04)
+        );
+      }
+
+      .day-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .day-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .day-number {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: var(--green);
+        background: var(--green-glow);
+        border: 1px solid rgba(127, 196, 67, 0.2);
+        border-radius: 4px;
+        padding: 3px 8px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .day-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-bright);
+      }
+
+      .day-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .day-check-count {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.65rem;
+        color: var(--text-dim);
+      }
+
+      .day-done-badge {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.6rem;
+        color: var(--green);
+        background: var(--green-glow);
+        border: 1px solid rgba(127, 196, 67, 0.25);
+        border-radius: 3px;
+        padding: 2px 7px;
+        letter-spacing: 0.06em;
+        display: none;
+      }
+
+      .day-card.all-done .day-done-badge {
+        display: block;
+      }
+
+      .collapse-btn {
+        color: var(--text-dim);
+        font-size: 0.8rem;
+        transition: transform 0.2s;
+      }
+
+      .check-all-btn {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.58rem;
+        padding: 3px 8px;
+        border-radius: 3px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-dim);
+        cursor: pointer;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: all 0.15s;
+        white-space: nowrap;
+      }
+
+      .check-all-btn:hover {
+        border-color: var(--green-dim);
+        color: var(--green);
+      }
+
+      .reset-btn {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.62rem;
+        padding: 5px 12px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-dim);
+        cursor: pointer;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: all 0.15s;
+      }
+
+      .reset-btn:hover {
+        border-color: var(--red);
+        color: var(--red);
+      }
+
+      .day-body {
+        padding: 16px 18px;
+      }
+      .day-body.collapsed {
+        display: none;
+      }
+
+      /* ── Time block ── */
+      .time-block {
+        margin-bottom: 14px;
+      }
+
+      .time-block:last-child {
+        margin-bottom: 0;
+      }
+
+      .time-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.6rem;
+        font-weight: 700;
+        color: var(--text-dim);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .time-label::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* ── Task item ── */
+      .task {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 5px;
+        margin-bottom: 4px;
+        transition: background 0.15s;
+        cursor: pointer;
+      }
+
+      .task:hover {
+        background: var(--surface2);
+      }
+
+      .task input[type="checkbox"] {
+        appearance: none;
+        width: 14px;
+        height: 14px;
+        border: 1.5px solid var(--green-dim);
+        border-radius: 3px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.15s;
+      }
+
+      .task input[type="checkbox"]:checked {
+        background: var(--green);
+        border-color: var(--green);
+      }
+
+      .task input[type="checkbox"]:checked::after {
+        content: "✓";
+        position: absolute;
+        top: -2px;
+        left: 1px;
+        font-size: 10px;
+        color: #0c0f0a;
+        font-weight: 700;
+      }
+
+      .task-content {
+        flex: 1;
+      }
+
+      .task-text {
+        font-size: 0.8rem;
+        color: var(--text);
+        line-height: 1.5;
+        transition: color 0.15s;
+      }
+
+      .task.checked .task-text {
+        color: var(--text-dim);
+        text-decoration: line-through;
+        text-decoration-color: var(--text-dim);
+      }
+
+      .task-link {
+        display: inline-block;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.62rem;
+        color: var(--green);
+        margin-top: 3px;
+        text-decoration: none;
+        letter-spacing: 0.03em;
+        opacity: 0.8;
+        transition: opacity 0.15s;
+      }
+
+      .task-link:hover {
+        opacity: 1;
+        text-decoration: underline;
+      }
+
+      .task-note {
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        margin-top: 3px;
+        line-height: 1.4;
+        font-style: italic;
+      }
+
+      /* type badges on tasks */
+      .task-badge {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.55rem;
+        padding: 1px 6px;
+        border-radius: 2px;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        white-space: nowrap;
+        flex-shrink: 0;
+        margin-top: 3px;
+      }
+
+      .badge-sql {
+        background: rgba(107, 163, 214, 0.15);
+        color: var(--blue);
+      }
+      .badge-linux {
+        background: rgba(232, 169, 60, 0.12);
+        color: var(--amber);
+      }
+      .badge-python {
+        background: rgba(127, 196, 67, 0.1);
+        color: var(--green);
+      }
+      .badge-git {
+        background: rgba(224, 92, 92, 0.1);
+        color: var(--red);
+      }
+      .badge-setup {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-dim);
+      }
+      .badge-build {
+        background: rgba(180, 120, 255, 0.1);
+        color: #b478ff;
+      }
+      .badge-cert {
+        background: rgba(127, 196, 67, 0.2);
+        color: var(--green);
+        border: 1px solid rgba(127, 196, 67, 0.3);
+      }
+
+      /* milestone card */
+      .milestone-card {
+        margin-top: 28px;
+        border: 1px solid rgba(127, 196, 67, 0.25);
+        border-radius: 8px;
+        padding: 18px 20px;
+        background: var(--green-glow);
+      }
+
+      .milestone-card h3 {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--green);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 8px;
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .milestone-card p {
+        font-size: 0.82rem;
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      /* special day-7 / day-14 full width */
+      .day-card.wide {
+        grid-column: 1 / -1;
+      }
+
+      /* ── Cert row ── */
+      .cert-earned {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: rgba(127, 196, 67, 0.06);
+        border: 1px solid rgba(127, 196, 67, 0.2);
+        border-radius: 5px;
+        margin-bottom: 8px;
+      }
+
+      .cert-earned .cert-icon {
+        font-size: 1rem;
+      }
+      .cert-earned .cert-name {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--green);
+      }
+      .cert-earned .cert-platform {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.62rem;
+        color: var(--text-dim);
+        margin-top: 1px;
+      }
+
+      /* scroll nav */
+      .floating-nav {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 200;
+      }
+
+      .float-btn {
+        width: 40px;
+        height: 40px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text-dim);
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+
+      .float-btn:hover {
+        border-color: var(--green-dim);
+        color: var(--green);
+      }
+
+      @media (max-width: 700px) {
+        header {
+          padding: 18px 20px 14px;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .week-tabs {
+          padding: 0 20px;
+        }
+        .week-panel {
+          padding: 24px 20px;
+        }
+        .days-grid {
+          grid-template-columns: 1fr;
+        }
+        .day-card.wide {
+          grid-column: 1;
+        }
+        .progress-bar-wrap {
+          max-width: 100%;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-left">
+        <h1>DE Journey — Week 1 & 2</h1>
+        <p>// your personalized data engineering bootcamp</p>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-label">
+          <span>Overall progress</span>
+          <span id="progress-text">0 / 0 tasks</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+      <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+    </header>
+
+    <div class="week-tabs">
+      <button class="week-tab active" onclick="showWeek(1, this)">
+        Week 1 — SQL + Linux
+      </button>
+      <button class="week-tab" onclick="showWeek(2, this)">
+        Week 2 — Python + Pandas + Linux
+      </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ WEEK 1 -->
+    <div class="week-panel active" id="week-1">
+      <div class="week-header">
+        <h2>Week 1 — <span>SQL Mastery</span> + Linux Foundations</h2>
+        <p>
+          Your first 7 days build the two most fundamental DE skills in
+          parallel: deep SQL and Linux command-line fluency. Every day has a
+          morning main course, an afternoon build session, a SQL practice block,
+          and a Linux block.
+        </p>
+        <div class="week-focus">
+          <span class="focus-tag tag-sql">SQL Deep</span>
+          <span class="focus-tag tag-linux">Linux Unhatched</span>
+          <span class="focus-tag tag-git">GitHub Daily</span>
+          <span class="focus-tag tag-project">First Project</span>
+        </div>
+      </div>
+
+      <div class="days-grid">
+        <!-- DAY 1 -->
+        <div class="day-card" id="card-day1">
+          <div class="day-header" onclick="toggleDay('day1-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 01</span>
+              <span class="day-title">Setup Everything + First SQL</span>
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day1">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day1-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 10:00 · Setup</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-setup"
+                  >setup</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Create your master study folder:
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >~/de-journey/</code
+                    >
+                    with subfolders: sql/, python/, linux-notes/, projects/
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-setup"
+                  >setup</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Create a GitHub repo called <strong>de-journey</strong> —
+                    make it public, push a README.md that says who you are and
+                    what you're building
+                  </div>
+                  <a class="task-link" href="https://github.com" target="_blank"
+                    >→ github.com</a
+                  >
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-setup"
+                  >setup</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Create accounts on: FreeCodeCamp, Kaggle, StrataScratch,
+                    Cisco Skills for All (all free)
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://freecodecamp.org"
+                    target="_blank"
+                    >→ freecodecamp.org</a
+                  >
+                  <a
+                    class="task-link"
+                    style="margin-left: 10px"
+                    href="https://www.kaggle.com"
+                    target="_blank"
+                    >→ kaggle.com</a
+                  >
+                  <a
+                    class="task-link"
+                    style="margin-left: 10px"
+                    href="https://skillsforall.com"
+                    target="_blank"
+                    >→ skillsforall.com</a
+                  >
+                  <a
+                    class="task-link"
+                    style="margin-left: 10px"
+                    href="https://stratascratch.com"
+                    target="_blank"
+                    >→ stratascratch.com</a
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">10:00 – 12:30 · Main Course</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Start FreeCodeCamp
+                    <strong>Relational Database Certification</strong> —
+                    complete "Learn How to Use the Command Line with Bash"
+                    (first module, it also teaches Linux basics — double win)
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.freecodecamp.org/learn/relational-database/"
+                    target="_blank"
+                    >→ freecodecamp.org/learn/relational-database</a
+                  >
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Also start Kaggle <strong>Intro to SQL</strong> — complete
+                    Lesson 1 "Getting Started with SQL and BigQuery"
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.kaggle.com/learn/intro-to-sql"
+                    target="_blank"
+                    >→ kaggle.com/learn/intro-to-sql</a
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">13:30 – 15:00 · Practice</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — solve 5 easy-level SQL problems. Don't skip
+                    any even if they feel simple. Focus on writing clean,
+                    readable queries.
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://platform.stratascratch.com/coding?code_type=1&difficulty%5B%5D=1"
+                    target="_blank"
+                    >→ stratascratch.com (Easy SQL)</a
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:30 · Linux</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Register and start <strong>NDG Linux Unhatched</strong> on
+                    Cisco Skills for All — complete Module 1 (Introduction) and
+                    Module 2 (Command Line Basics)
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://skillsforall.com/course/ndg-linux-unhatched"
+                    target="_blank"
+                    >→ skillsforall.com → NDG Linux Unhatched</a
+                  >
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Open your terminal and practice:
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >pwd · ls · cd · mkdir · rm · cp · mv</code
+                    >
+                    — navigate into your de-journey folder and explore
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">17:00 – 17:30 · Commit</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >git</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Push your first commit to GitHub: update your README with
+                    "Day 1 done — SQL + Linux started." Write it in English.
+                  </div>
+                  <div class="task-note">
+                    This daily commit habit is visible to employers. Start now,
+                    never break it.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">Evening · Watch</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-setup"
+                  >watch</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Watch on YouTube:
+                    <strong
+                      >"What is a Data Engineer?" by Darshil Parmar</strong
+                    >
+                    — this gives you the big picture motivation for everything
+                    you're learning
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.youtube.com/@darshilparmar"
+                    target="_blank"
+                    >→ youtube.com/@darshilparmar</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 2 -->
+        <div class="day-card" id="card-day2">
+          <div class="day-header" onclick="toggleDay('day2-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 02</span>
+              <span class="day-title">PostgreSQL + JOINs + Linux Files</span>
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day2">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day2-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 12:00 · Main Course</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    FreeCodeCamp — continue Relational Database cert: start
+                    <strong
+                      >"Learn Relational Databases by Building a Mario
+                      Database"</strong
+                    >. This teaches PostgreSQL through a real project.
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.freecodecamp.org/learn/relational-database/"
+                    target="_blank"
+                    >→ freecodecamp.org/learn/relational-database</a
+                  >
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Kaggle Intro to SQL — complete Lesson 2 "Select, From &
+                    Where" and Lesson 3 "Group By, Having & Count"
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.kaggle.com/learn/intro-to-sql"
+                    target="_blank"
+                    >→ kaggle.com/learn/intro-to-sql</a
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">13:00 – 15:00 · Practice</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — solve 5 easy SQL problems focused on GROUP
+                    BY and aggregations (COUNT, SUM, AVG, MAX, MIN). Write your
+                    solutions in a .sql file in your sql/ folder.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:30 · Linux</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    NDG Linux Unhatched — complete Module 3 (Getting Help) and
+                    Module 4 (Working with Files). Learn:
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >man · cat · head · tail · less · grep</code
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Practice in terminal: create a text file with
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >echo</code
+                    >, search it with
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >grep</code
+                    >, view it with
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >cat</code
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">17:00 – 17:30 · Commit</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >git</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Push your .sql files from today's StrataScratch solutions to
+                    GitHub. Commit message:
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >day-02: GROUP BY practice + PostgreSQL Mario DB</code
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 3 -->
+        <div class="day-card" id="card-day3">
+          <div class="day-header" onclick="toggleDay('day3-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 03</span>
+              <span class="day-title">JOINs Deep Dive + Linux Permissions</span>
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day3">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day3-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 12:00 · Main Course</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Kaggle Intro to SQL — complete Lesson 4 "Order By" and
+                    Lesson 5 "AS & With (CTEs)" and Lesson 6 "Joining Data".
+                    Complete the entire course and earn your first certificate.
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.kaggle.com/learn/intro-to-sql"
+                    target="_blank"
+                    >→ kaggle.com/learn/intro-to-sql</a
+                  >
+                  <div class="task-note">
+                    🏅 Collect your Kaggle Intro to SQL certificate when done.
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    FreeCodeCamp — continue Mario Database. Aim to finish it
+                    today. This earns one of the 5 required FCC projects.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">13:00 – 15:00 · Practice</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — 5 problems specifically using JOINs (INNER,
+                    LEFT, RIGHT). If easy ones are done, move to medium
+                    difficulty. Write all solutions to GitHub.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:30 · Linux</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    NDG Linux Unhatched — complete Module 5 (File Permissions)
+                    and Module 6 (Redirecting). Understand:
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >chmod · chown · > · >> · |</code
+                    >
+                    (pipes)
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Practice pipes:
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >cat file.txt | grep "word" | sort | uniq</code
+                    >
+                    — chain 3 commands together in your terminal
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">17:00 – 17:30 · Commit</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >git</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Push JOIN solutions. Add your Kaggle SQL Intro certificate
+                    link to your README. Commit daily.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 4 -->
+        <div class="day-card" id="card-day4">
+          <div class="day-header" onclick="toggleDay('day4-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 04</span>
+              <span class="day-title">Window Functions + Advanced SQL</span>
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day4">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day4-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 12:00 · Main Course</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Start Kaggle <strong>Advanced SQL</strong> — complete Lesson
+                    1 "JOINs and UNIONs" and Lesson 2 "Analytic Functions
+                    (Window Functions)". Window functions are the single most
+                    important SQL concept for DE interviews.
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.kaggle.com/learn/advanced-sql"
+                    target="_blank"
+                    >→ kaggle.com/learn/advanced-sql</a
+                  >
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    FreeCodeCamp — start
+                    <strong>"Learn SQL by Building a Student Database"</strong>.
+                    This is project 2 of 5 for the FCC cert.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">13:00 – 15:00 · Practice</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — 5 problems using window functions:
+                    ROW_NUMBER(), RANK(), LAG(), LEAD(). These appear in almost
+                    every DE/DA interview at MNCs and remote companies.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:30 · Linux</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    NDG Linux Unhatched — complete Module 7 (Getting Help
+                    Online) and finish the full course. Take the final quiz to
+                    earn your completion badge.
+                  </div>
+                  <div class="task-note">
+                    🏅 Earn your NDG Linux Unhatched badge — add it to your
+                    LinkedIn.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">17:00 – 17:30 · Commit</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >git</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Push window function SQL solutions. Create a
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >sql/notes/window-functions.md</code
+                    >
+                    file with your notes on ROW_NUMBER, RANK, LAG, LEAD in your
+                    own words.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">Evening · Watch</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-setup"
+                  >watch</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    YouTube: <strong>"Linux in 100 Seconds"</strong> by Fireship
+                    + <strong>"Linux Command Line for Beginners"</strong> by
+                    NetworkChuck — both entertaining and fast
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.youtube.com/@NetworkChuck"
+                    target="_blank"
+                    >→ youtube.com/@NetworkChuck</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 5 -->
+        <div class="day-card" id="card-day5">
+          <div class="day-header" onclick="toggleDay('day5-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 05</span>
+              <span class="day-title">CTEs + Subqueries + Linux Processes</span>
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day5">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day5-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 12:00 · Main Course</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Kaggle Advanced SQL — complete Lesson 3 "Nested and Repeated
+                    Data" and Lesson 4 "Writing Efficient Queries". Learn query
+                    optimization — this separates junior from senior DE
+                    candidates.
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    FreeCodeCamp — continue Student Database project. Practice
+                    writing CTEs — use
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >WITH cte_name AS (...) SELECT ...</code
+                    >
+                    in every complex query you write from now on.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">13:00 – 15:00 · Practice</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — 5 medium problems using CTEs and subqueries.
+                    Try to write at least 3 solutions using CTEs instead of
+                    nested subqueries. CTEs are more readable and preferred in
+                    professional code.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:30 · Linux</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Start <strong>NDG Linux Essentials</strong> on Cisco Skills
+                    for All — complete Chapter 1 (Linux Evolution) and Chapter 2
+                    (Applications). This course is longer and earns you an
+                    LPI-recognized certificate.
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://skillsforall.com/course/ndg-linux-essentials"
+                    target="_blank"
+                    >→ skillsforall.com → NDG Linux Essentials</a
+                  >
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Practice: use
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >ps · top · kill · jobs · &</code
+                    >
+                    to manage processes in your terminal. Run a Python script in
+                    the background with
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >python3 script.py &</code
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">17:00 – 17:30 · Commit</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >git</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Push CTE/subquery solutions. Write a
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >linux-notes/week1.md</code
+                    >
+                    with all commands you've learned so far — in your own words.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 6 -->
+        <div class="day-card" id="card-day6">
+          <div class="day-header" onclick="toggleDay('day6-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 06</span>
+              <span class="day-title"
+                >Complete Kaggle Advanced SQL + Bash Scripting</span
+              >
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day6">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day6-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 12:00 · Main Course</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Kaggle Advanced SQL — complete Lesson 5 (final lesson) and
+                    finish the course. Earn your
+                    <strong>Advanced SQL certificate</strong>.
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.kaggle.com/learn/advanced-sql"
+                    target="_blank"
+                    >→ kaggle.com/learn/advanced-sql</a
+                  >
+                  <div class="task-note">
+                    🏅 Certificate #2 earned. Download it and add to LinkedIn.
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    FreeCodeCamp — finish the Student Database project. Start
+                    <strong
+                      >"Learn Advanced Bash by Building a Bike Rental
+                      Shop"</strong
+                    >
+                    — this one builds both SQL and Linux skills simultaneously.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">13:00 – 15:00 · Practice</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — 5 medium problems. Focus on problems from
+                    real companies: Airbnb, Uber, Spotify. These are the closest
+                    to actual DE interview questions.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:30 · Linux</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    NDG Linux Essentials — complete Chapters 3 and 4 (Working on
+                    the Command Line, Getting Help)
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Write your first bash script: create
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >backup.sh</code
+                    >
+                    that copies all .sql files from sql/ to a backup/ folder.
+                    Run it with
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >chmod +x backup.sh && ./backup.sh</code
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">17:00 – 17:30 · Commit</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >git</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Commit your backup.sh script and today's SQL solutions. Push
+                    to GitHub.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 7 — WIDE review day -->
+        <div class="day-card wide" id="card-day7">
+          <div class="day-header" onclick="toggleDay('day7-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 07</span>
+              <span class="day-title"
+                >🏁 Week 1 Review + First Portfolio Project</span
+              >
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day7">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day7-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 11:00 · Review All SQL</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — do 10 problems (mixed easy + medium). Time
+                    yourself: aim for under 10 minutes per problem. No looking
+                    at hints unless truly stuck.
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Write a personal SQL cheatsheet in
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >sql/notes/cheatsheet.md</code
+                    >
+                    — cover: SELECT, WHERE, GROUP BY, HAVING, JOINs, CTEs,
+                    Window Functions, ORDER BY. Write it from memory first, then
+                    check.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">11:00 – 15:00 · First Real Project</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-build"
+                  >build</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Build your first portfolio project:
+                    <strong>Vietnam Air Quality SQL Analysis</strong>. Download
+                    OpenAQ Vietnam data (free public API), load it into
+                    PostgreSQL locally, then write 5 analytical SQL queries
+                    answering real questions: worst provinces, seasonal
+                    patterns, trends over time.
+                  </div>
+                  <a class="task-link" href="https://openaq.org" target="_blank"
+                    >→ openaq.org (free public data)</a
+                  >
+                  <div class="task-note">
+                    This becomes a real portfolio piece. Make it look good.
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-build"
+                  >build</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Create a proper GitHub repo for this project:
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >vietnam-air-quality-sql</code
+                    >
+                    with a clean English README that explains what it does, how
+                    to run it, and what you found.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:30 · Linux</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    NDG Linux Essentials — complete Chapters 5 and 6. Review all
+                    Linux commands learned this week. Write a
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >linux-notes/cheatsheet.md</code
+                    >
+                    from memory.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">17:00 – 17:30 · LinkedIn Post</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >LinkedIn</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Write your first LinkedIn post in English: "Week 1 done on
+                    my Data Engineering journey. Here's what I learned: [SQL
+                    window functions, CTEs, Linux CLI]. Here's what I built:
+                    [link to project]." This starts building your public
+                    presence.
+                  </div>
+                  <div class="task-note">
+                    IELTS 8.0 — your English is strong. Use it. This post will
+                    be seen by recruiters.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="milestone-card">
+              <h3>🏅 Week 1 Certificates Earned</h3>
+              <p>Check that you have these before moving to Week 2:</p>
+              <br />
+              <div class="cert-earned">
+                <span class="cert-icon">🏅</span>
+                <div>
+                  <div class="cert-name">Kaggle Intro to SQL</div>
+                  <div class="cert-platform">Kaggle · Free certificate</div>
+                </div>
+              </div>
+              <div class="cert-earned">
+                <span class="cert-icon">🏅</span>
+                <div>
+                  <div class="cert-name">Kaggle Advanced SQL</div>
+                  <div class="cert-platform">Kaggle · Free certificate</div>
+                </div>
+              </div>
+              <div class="cert-earned">
+                <span class="cert-icon">🏅</span>
+                <div>
+                  <div class="cert-name">NDG Linux Unhatched</div>
+                  <div class="cert-platform">
+                    Cisco Skills for All · Free badge
+                  </div>
+                </div>
+              </div>
+              <div class="cert-earned">
+                <span class="cert-icon">🔄</span>
+                <div>
+                  <div class="cert-name">
+                    FCC Relational Database (in progress)
+                  </div>
+                  <div class="cert-platform">
+                    FreeCodeCamp · 2/5 projects done
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- end days-grid week 1 -->
+    </div>
+    <!-- end week-1 -->
+
+    <!-- ═══════════════════════════════════════════════════════ WEEK 2 -->
+    <div class="week-panel" id="week-2">
+      <div class="week-header">
+        <h2>Week 2 — <span>Python for DE</span> + Linux Essentials</h2>
+        <p>
+          This week you shift the main focus to Python as a Data Engineer uses
+          it — APIs, file handling, pandas, automation. SQL practice continues
+          daily. Linux track advances with NDG Linux Essentials.
+        </p>
+        <div class="week-focus">
+          <span class="focus-tag tag-python">Python DE</span>
+          <span class="focus-tag tag-sql">SQL Daily</span>
+          <span class="focus-tag tag-linux">Linux Essentials</span>
+          <span class="focus-tag tag-project">API Pipeline</span>
+        </div>
+      </div>
+
+      <div class="days-grid">
+        <!-- DAY 8 -->
+        <div class="day-card" id="card-day8">
+          <div class="day-header" onclick="toggleDay('day8-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 08</span>
+              <span class="day-title">Python for DE — APIs + File I/O</span>
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day8">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day8-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 12:00 · Main Course</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-python"
+                  >Python</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Start FreeCodeCamp
+                    <strong>Data Analysis with Python Certification</strong> —
+                    complete the first two sections: "Data Analysis with Python
+                    Course" videos (watch 1–5). Take notes on pandas basics.
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.freecodecamp.org/learn/data-analysis-with-python/"
+                    target="_blank"
+                    >→ freecodecamp.org/learn/data-analysis-with-python</a
+                  >
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-python"
+                  >Python</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Start Kaggle <strong>Python micro-course</strong> — complete
+                    Lesson 1 "Hello, Python" and Lesson 2 "Functions and Getting
+                    Help". Skip anything you already know, but read it all.
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.kaggle.com/learn/python"
+                    target="_blank"
+                    >→ kaggle.com/learn/python</a
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">13:00 – 15:00 · Build</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-build"
+                  >build</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Write a Python script that calls a free public API and saves
+                    data to a JSON file. Use the
+                    <strong>Open-Meteo weather API</strong> (no key needed) to
+                    get Hanoi's weather forecast. Save result to
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >data/hanoi_weather.json</code
+                    >
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://open-meteo.com/en/docs"
+                    target="_blank"
+                    >→ open-meteo.com/en/docs (free, no API key)</a
+                  >
+                  <div class="task-note">
+                    Use: requests.get(url).json() — save with json.dump()
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:00 · SQL (Daily)</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — 5 medium SQL problems. From now on, SQL
+                    practice is a daily non-negotiable 1-hour block. Don't skip
+                    it even when busy.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">16:00 – 17:00 · Linux</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    NDG Linux Essentials — complete Chapters 7 and 8 (Navigating
+                    the Filesystem, Working with Files and Directories)
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">17:00 – 17:30 · Commit</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >git</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Create
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >projects/weather-pipeline/fetch.py</code
+                    >
+                    and push to GitHub with a README explaining what it does.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 9 -->
+        <div class="day-card" id="card-day9">
+          <div class="day-header" onclick="toggleDay('day9-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 09</span>
+              <span class="day-title">Pandas Fundamentals + Data Cleaning</span>
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day9">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day9-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 12:00 · Main Course</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-python"
+                  >Python</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Start Kaggle <strong>Pandas micro-course</strong> — complete
+                    all 6 lessons in one session: Creating/Reading/Writing,
+                    Indexing, Summary Functions, Grouping, Data Types & Missing
+                    Values, Renaming & Combining.
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.kaggle.com/learn/pandas"
+                    target="_blank"
+                    >→ kaggle.com/learn/pandas</a
+                  >
+                  <div class="task-note">
+                    🏅 Aim to complete the full Pandas course today and earn the
+                    certificate.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">13:00 – 15:00 · Build</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-build"
+                  >build</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Extend your weather pipeline: load the JSON file into a
+                    pandas DataFrame → clean the data (rename columns, handle
+                    nulls, convert types) → save as a clean CSV to
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >data/hanoi_weather_clean.csv</code
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-build"
+                  >build</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Add basic analysis: print the max temp, min temp, average
+                    humidity using pandas. Print a summary to console using
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >df.describe()</code
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:00 · SQL (Daily)</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — 5 medium problems. Today focus on problems
+                    involving date/time functions: DATE_TRUNC, EXTRACT, DATEDIFF
+                    — very common in real DE pipelines.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">16:00 – 17:00 · Linux</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    NDG Linux Essentials — complete Chapters 9 and 10 (Archiving
+                    and Compression, Working with Text). Learn:
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >tar · gzip · sort · wc · sed · awk</code
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">17:00 – 17:30 · Commit</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >git</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Push the updated pipeline with pandas cleaning. Your commit
+                    message:
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >day-09: add pandas cleaning step to weather
+                      pipeline</code
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 10 -->
+        <div class="day-card" id="card-day10">
+          <div class="day-header" onclick="toggleDay('day10-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 10</span>
+              <span class="day-title"
+                >Python Functions + Error Handling + Logging</span
+              >
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day10">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day10-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 12:00 · Main Course</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-python"
+                  >Python</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    FreeCodeCamp Data Analysis cert — watch lectures 6–12 and
+                    work through the NumPy section. Focus on the concepts, not
+                    memorizing APIs.
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-python"
+                  >Python</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Kaggle Python — complete Lessons 3–5 (Booleans and
+                    Conditionals, Lists, Loops and List Comprehensions). These
+                    are daily tools in DE scripts.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">13:00 – 15:00 · Build</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-build"
+                  >build</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Refactor your weather pipeline into clean functions:
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >extract()</code
+                    >,
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >transform()</code
+                    >,
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >load()</code
+                    >. This is the ELT pattern — the core pattern of all DE
+                    pipelines.
+                  </div>
+                  <div class="task-note">
+                    Add try/except error handling to the extract() function. Add
+                    logging with Python's logging module — print INFO messages
+                    at each step.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:00 · SQL (Daily)</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — 5 problems. Try your first hard-level
+                    problem today. Hard ones often appear in senior DE
+                    interviews — good to see the shape of them early.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">16:00 – 17:00 · Linux</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    NDG Linux Essentials — Chapters 11 and 12 (Basic Scripting,
+                    Understanding Computer Hardware). Write a bash script with
+                    variables, if statements, and a for loop.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">17:00 – 17:30 · Commit</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >git</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Push refactored pipeline. Your project now has real
+                    structure — it looks like professional code. Commit message:
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >day-10: refactor into ETL functions + add logging</code
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 11 -->
+        <div class="day-card" id="card-day11">
+          <div class="day-header" onclick="toggleDay('day11-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 11</span>
+              <span class="day-title"
+                >Multi-city Pipeline + Bash Automation</span
+              >
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day11">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day11-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 12:00 · Main Course</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-python"
+                  >Python</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Kaggle Python — complete Lessons 6 and 7 (Strings and
+                    Dictionaries, Working with External Libraries). Complete the
+                    full course and earn the certificate.
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.kaggle.com/learn/python"
+                    target="_blank"
+                    >→ kaggle.com/learn/python</a
+                  >
+                  <div class="task-note">
+                    🏅 Kaggle Python certificate — certificate #3. Download and
+                    add to LinkedIn.
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-python"
+                  >Python</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    FreeCodeCamp — continue Data Analysis cert. Work through the
+                    matplotlib visualization section — bar charts, line graphs,
+                    histograms. You'll use these in portfolio presentations.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">13:00 – 15:00 · Build</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-build"
+                  >build</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Scale your pipeline to 5 Vietnamese cities: Hanoi, Ho Chi
+                    Minh City, Da Nang, Hue, Can Tho. Loop through a city list,
+                    call the API for each, combine all results into one pandas
+                    DataFrame, save as one CSV.
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-build"
+                  >build</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Write a bash script
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >run_pipeline.sh</code
+                    >
+                    that activates your Python environment and runs the script.
+                    Test it from the command line.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:00 · SQL (Daily)</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — 5 medium problems. Focus today on CASE WHEN
+                    statements and conditional aggregation — very common in
+                    reporting queries.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">16:00 – 17:00 · Linux</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    NDG Linux Essentials — Chapters 13 and 14 (Where Data is
+                    Stored, Network Configuration). Learn:
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >ping · curl · wget · ssh · ifconfig</code
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">17:00 – 17:30 · Commit</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >git</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Push multi-city pipeline + run_pipeline.sh. Your project now
+                    processes real data from 5 cities automatically — this is a
+                    real DE pipeline.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 12 -->
+        <div class="day-card" id="card-day12">
+          <div class="day-header" onclick="toggleDay('day12-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 12</span>
+              <span class="day-title">Cron Jobs + Schedule the Pipeline</span>
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day12">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day12-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 12:00 · Main Course</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-python"
+                  >Python</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    FreeCodeCamp — complete the 5 required projects for the
+                    <strong>Data Analysis with Python Certification</strong>:
+                    Mean-Variance-Standard Deviation Calculator, Demographic
+                    Data Analyzer, Medical Examination Data Visualizer, Page
+                    View Time Series Visualizer, Sea Level Predictor.
+                  </div>
+                  <div class="task-note">
+                    These projects are the cert requirement. Work through as
+                    many as you can today and Day 13.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">13:00 – 15:00 · Build</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-build"
+                  >build</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Schedule your pipeline with
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >cron</code
+                    >. Run
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >crontab -e</code
+                    >
+                    and add a job that runs your pipeline every hour. Verify it
+                    runs with
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >crontab -l</code
+                    >.
+                  </div>
+                  <div class="task-note">
+                    Congratulations — you now have an automated data pipeline
+                    running on a schedule. This is what data engineers do.
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-build"
+                  >build</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Add a logging step that appends each run's timestamp and
+                    status to a
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >logs/pipeline.log</code
+                    >
+                    file. Use bash:
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >echo "$(date): run success" >> logs/pipeline.log</code
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:00 · SQL (Daily)</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — 5 problems. Challenge: do all 5 using only
+                    CTEs (no subqueries). Clean code discipline starts now.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">16:00 – 17:00 · Linux</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    NDG Linux Essentials — Chapters 15 and 16 (Security,
+                    Creating Users and Groups). Understand:
+                    <code
+                      style="
+                        color: var(--amber);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >sudo · su · passwd · useradd · groups</code
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">17:00 – 17:30 · Commit</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >git</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Push everything: cron setup notes, logging step, FCC project
+                    progress. Commit message:
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >day-12: add cron scheduling + run logging</code
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 13 -->
+        <div class="day-card" id="card-day13">
+          <div class="day-header" onclick="toggleDay('day13-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 13</span>
+              <span class="day-title"
+                >Complete FCC Cert + Pandas Certificate</span
+              >
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day13">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day13-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 13:00 · Cert Push</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-cert"
+                  >cert</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    FreeCodeCamp — complete any remaining projects for the
+                    <strong>Data Analysis with Python Certification</strong>.
+                    Submit all 5 and claim your certificate.
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.freecodecamp.org/learn/data-analysis-with-python/"
+                    target="_blank"
+                    >→ freecodecamp.org/learn/data-analysis-with-python</a
+                  >
+                  <div class="task-note">
+                    🏅 Certificate #4 — FCC Data Analysis with Python. Add to
+                    LinkedIn immediately.
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-cert"
+                  >cert</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Confirm you've earned Kaggle Pandas certificate. If not done
+                    yet, complete it now.
+                  </div>
+                  <div class="task-note">
+                    🏅 Certificate #3 — Kaggle Pandas.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">13:00 – 15:00 · Build</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-build"
+                  >build</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Final pipeline polish: add a simple data quality check
+                    function — validate that no column has >20% null values. If
+                    it does, log a WARNING. This is real production DE behavior.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:00 · SQL (Daily)</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — 5 problems. Focus on problems mixing window
+                    functions + GROUP BY + CTEs. These are the most complex and
+                    realistic.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">16:00 – 17:00 · Linux</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    NDG Linux Essentials — complete Chapters 17–19 (final
+                    chapters). Take the chapter quizzes. You're nearing the
+                    finish line on this course.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">17:00 – 17:30 · Commit</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >git</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Push data quality check. Update your README to show all
+                    certificates earned so far. Link them directly in the
+                    README.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DAY 14 — WIDE -->
+        <div class="day-card wide" id="card-day14">
+          <div class="day-header" onclick="toggleDay('day14-body', this)">
+            <div class="day-header-left">
+              <span class="day-number">Day 14</span>
+              <span class="day-title"
+                >🏁 Week 2 Review + Project Polish + Next Phase Prep</span
+              >
+            </div>
+            <div class="day-meta">
+              <span class="day-check-count" id="count-day14">0/0</span>
+              <span class="day-done-badge">✓ DONE</span>
+              <span class="collapse-btn">▾</span>
+            </div>
+          </div>
+          <div class="day-body" id="day14-body">
+            <div class="time-block">
+              <div class="time-label">09:00 – 11:00 · Review + Polish</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-build"
+                  >build</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Polish your
+                    <strong>Vietnam Weather Pipeline</strong> project: clean up
+                    all code, write inline comments, finalize the README with:
+                    project description, tech stack, how to run it, what it
+                    produces, sample output screenshot.
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-build"
+                  >build</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Add a
+                    <code
+                      style="
+                        color: var(--green);
+                        font-family: &quot;JetBrains Mono&quot;, monospace;
+                        font-size: 0.78em;
+                      "
+                      >requirements.txt</code
+                    >
+                    file with all Python dependencies. Any engineer should be
+                    able to clone your repo and run it in 3 commands.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">
+                11:00 – 13:00 · FCC Relational Database Cert Push
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-cert"
+                  >cert</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    FreeCodeCamp Relational Database — complete any remaining
+                    projects to get all 5 done. Check progress and plan to
+                    finish the cert this week.
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://www.freecodecamp.org/learn/relational-database/"
+                    target="_blank"
+                    >→ freecodecamp.org/learn/relational-database</a
+                  >
+                  <div class="task-note">
+                    If you need more time, that's okay — aim to complete by Day
+                    16.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">13:00 – 15:00 · SQL Review</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-sql"
+                  >SQL</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    StrataScratch — do 10 mixed problems (5 medium, 5 hard).
+                    This is a final 2-week SQL health check. You should now be
+                    comfortable with 80% of medium problems without hints.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">15:00 – 16:00 · Linux Final</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-linux"
+                  >Linux</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    NDG Linux Essentials — take the final exam/assessment to
+                    earn your completion certificate.
+                  </div>
+                  <div class="task-note">
+                    🏅 NDG Linux Essentials completion badge — this prepares you
+                    for the LPI Linux Essentials exam.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="time-block">
+              <div class="time-label">16:00 – 17:30 · LinkedIn + Planning</div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-git"
+                  >LinkedIn</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Write Week 2 LinkedIn post in English. Share your pipeline
+                    project link, what you built, what surprised you. Tag it
+                    #DataEngineering #Python #OpenToWork.
+                  </div>
+                  <div class="task-note">
+                    Recruiters from Vietnam MNCs and international remote
+                    companies actively search these tags.
+                  </div>
+                </div>
+              </div>
+              <div class="task" onclick="toggleTask(this, event)">
+                <input type="checkbox" /><span class="task-badge badge-setup"
+                  >next</span
+                >
+                <div class="task-content">
+                  <div class="task-text">
+                    Sign up for <strong>DataTalks.Club</strong> and join their
+                    Slack. Browse the DE Zoomcamp cohort schedule — register for
+                    the next one. This is your Phase 2 starting point.
+                  </div>
+                  <a
+                    class="task-link"
+                    href="https://datatalks.club/slack.html"
+                    target="_blank"
+                    >→ datatalks.club/slack.html</a
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="milestone-card">
+              <h3>🏅 End of Week 2 — Certificates Earned</h3>
+              <p>
+                By the end of Day 14, you should have these. If any are missing,
+                finish them before starting Week 3.
+              </p>
+              <br />
+              <div class="cert-earned">
+                <span class="cert-icon">🏅</span>
+                <div>
+                  <div class="cert-name">Kaggle Intro to SQL</div>
+                  <div class="cert-platform">Kaggle · Free</div>
+                </div>
+              </div>
+              <div class="cert-earned">
+                <span class="cert-icon">🏅</span>
+                <div>
+                  <div class="cert-name">Kaggle Advanced SQL</div>
+                  <div class="cert-platform">Kaggle · Free</div>
+                </div>
+              </div>
+              <div class="cert-earned">
+                <span class="cert-icon">🏅</span>
+                <div>
+                  <div class="cert-name">Kaggle Python</div>
+                  <div class="cert-platform">Kaggle · Free</div>
+                </div>
+              </div>
+              <div class="cert-earned">
+                <span class="cert-icon">🏅</span>
+                <div>
+                  <div class="cert-name">Kaggle Pandas</div>
+                  <div class="cert-platform">Kaggle · Free</div>
+                </div>
+              </div>
+              <div class="cert-earned">
+                <span class="cert-icon">🏅</span>
+                <div>
+                  <div class="cert-name">FCC Data Analysis with Python</div>
+                  <div class="cert-platform">FreeCodeCamp · Free</div>
+                </div>
+              </div>
+              <div class="cert-earned">
+                <span class="cert-icon">🏅</span>
+                <div>
+                  <div class="cert-name">NDG Linux Unhatched</div>
+                  <div class="cert-platform">Cisco Skills for All · Free</div>
+                </div>
+              </div>
+              <div class="cert-earned">
+                <span class="cert-icon">🏅</span>
+                <div>
+                  <div class="cert-name">NDG Linux Essentials</div>
+                  <div class="cert-platform">Cisco Skills for All · Free</div>
+                </div>
+              </div>
+              <div class="cert-earned">
+                <span class="cert-icon">🔄</span>
+                <div>
+                  <div class="cert-name">
+                    FCC Relational Database (complete by Day 16)
+                  </div>
+                  <div class="cert-platform">FreeCodeCamp · Free</div>
+                </div>
+              </div>
+              <br />
+              <p style="margin-top: 4px">
+                <strong style="color: var(--green)">What you've built:</strong>
+                A fully automated, multi-city Vietnam weather data pipeline —
+                Python + pandas + bash + cron — running on a schedule, with
+                logging, error handling, and data quality checks. This is a real
+                portfolio project.
+              </p>
+              <p style="margin-top: 10px">
+                <strong style="color: var(--amber)">Next up (Week 3–6):</strong>
+                Git deep-dive, Docker, and beginning the DE Zoomcamp. The
+                foundation you've built these 2 weeks makes everything in
+                Zoomcamp click faster.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- end days-grid week 2 -->
+    </div>
+    <!-- end week-2 -->
+
+    <div class="floating-nav">
+      <button
+        class="float-btn"
+        onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+        title="Back to top"
+      >
+        ↑
+      </button>
+    </div>
+
+    <script>
+      // ── Week switching
+      function showWeek(n, btn) {
+        document
+          .querySelectorAll(".week-panel")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".week-tab")
+          .forEach((t) => t.classList.remove("active"));
+        document.getElementById("week-" + n).classList.add("active");
+        btn.classList.add("active");
+      }
+
+      // ── Collapse/expand
+      function toggleDay(bodyId, header) {
+        const body = document.getElementById(bodyId);
+        const btn = header.querySelector(".collapse-btn");
+        const collapsed = body.classList.toggle("collapsed");
+        btn.style.transform = collapsed ? "rotate(-90deg)" : "";
+      }
+
+      // ── Task toggle — clicking anywhere on the row toggles the checkbox
+      function toggleTask(taskEl, event) {
+        if (event && event.target.type === "checkbox") return;
+        const cb = taskEl.querySelector('input[type="checkbox"]');
+        cb.checked = !cb.checked;
+        taskEl.classList.toggle("checked", cb.checked);
+        updateProgress();
+      }
+
+      // Clicking the checkbox directly
+      document.addEventListener("change", (e) => {
+        if (e.target.type === "checkbox") {
+          const task = e.target.closest(".task");
+          if (task) task.classList.toggle("checked", e.target.checked);
+          updateProgress();
+        }
+      });
+
+      // Prevent checkbox click from bubbling up to the row's onclick
+      document
+        .querySelectorAll('.task input[type="checkbox"]')
+        .forEach((cb) => {
+          cb.addEventListener("click", (e) => e.stopPropagation());
+        });
+
+      // ── Check all / uncheck all for a single day
+      function checkAllDay(dayNum, btn) {
+        const body = document.getElementById("day" + dayNum + "-body");
+        if (!body) return;
+        const cbs = body.querySelectorAll('input[type="checkbox"]');
+        const allChecked = [...cbs].every((cb) => cb.checked);
+        cbs.forEach((cb) => {
+          cb.checked = !allChecked;
+          cb.closest(".task").classList.toggle("checked", !allChecked);
+        });
+        btn.textContent = allChecked ? "✓ All" : "✗ None";
+        setTimeout(() => {
+          btn.textContent = allChecked ? "✓ All" : "✗ None";
+        }, 0);
+        updateProgress();
+      }
+
+      // ── Reset everything
+      function resetAll() {
+        if (!confirm("Reset all checkboxes? This cannot be undone.")) return;
+        document
+          .querySelectorAll('.task input[type="checkbox"]')
+          .forEach((cb) => {
+            cb.checked = false;
+            cb.closest(".task").classList.remove("checked");
+          });
+        // Reset check-all button labels
+        document
+          .querySelectorAll(".check-all-btn")
+          .forEach((btn) => (btn.textContent = "✓ All"));
+        updateProgress();
+      }
+
+      function updateProgress() {
+        const allCBs = document.querySelectorAll(
+          '.task input[type="checkbox"]',
+        );
+        const checkedCBs = document.querySelectorAll(
+          '.task input[type="checkbox"]:checked',
+        );
+        const total = allCBs.length;
+        const done = checkedCBs.length;
+        const pct = total ? Math.round((done / total) * 100) : 0;
+
+        document.getElementById("progress-fill").style.width = pct + "%";
+        document.getElementById("progress-text").textContent =
+          done + " / " + total + " tasks";
+
+        // Per-day counts + done badge + check-all label
+        for (let d = 1; d <= 14; d++) {
+          const body = document.getElementById("day" + d + "-body");
+          if (!body) continue;
+          const dayCBs = body.querySelectorAll('input[type="checkbox"]');
+          const dayDone = body.querySelectorAll(
+            'input[type="checkbox"]:checked',
+          );
+          const countEl = document.getElementById("count-day" + d);
+          if (countEl)
+            countEl.textContent = dayDone.length + "/" + dayCBs.length;
+          const card = document.getElementById("card-day" + d);
+          if (card)
+            card.classList.toggle(
+              "all-done",
+              dayCBs.length > 0 && dayDone.length === dayCBs.length,
+            );
+          // update check-all button label
+          const caBtn = document.getElementById("ca-day" + d);
+          if (caBtn) {
+            const allDone =
+              dayCBs.length > 0 && dayDone.length === dayCBs.length;
+            caBtn.textContent = allDone ? "✗ None" : "✓ All";
+          }
+        }
+      }
+
+      // ── Inject check-all buttons into each day header
+      for (let d = 1; d <= 14; d++) {
+        const meta = document.querySelector("#card-day" + d + " .day-meta");
+        if (!meta) continue;
+        const btn = document.createElement("button");
+        btn.className = "check-all-btn";
+        btn.id = "ca-day" + d;
+        btn.textContent = "✓ All";
+        btn.title = "Check / uncheck all tasks for this day";
+        const dayNum = d;
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation(); // don't trigger collapse
+          checkAllDay(dayNum, btn);
+        });
+        meta.insertBefore(btn, meta.querySelector(".day-check-count"));
+      }
+
+      // Init
+      updateProgress();
+    </script>
+  </body>
+</html>
